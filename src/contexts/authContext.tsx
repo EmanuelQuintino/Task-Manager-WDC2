@@ -58,7 +58,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     return API.post("/user", { name, email, password })
       .then((response) => {
-        if (response.data.status == 201) {
+        if (response.status == 201) {
           alert("Usuário cadastrado com sucesso!");
         }
 

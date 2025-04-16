@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useState } from "react";
+import { createContext, PropsWithChildren, useEffect, useState } from "react";
 import { API } from "../configs/api";
 import { STORAGE_USERID_KEY } from "../utils/userIdAuthKey";
 
@@ -81,6 +81,30 @@ export function AuthProvider({ children }: PropsWithChildren) {
       console.error(error);
     });
   }
+
+  useEffect(() => {
+    const userIDStorage = localStorage.getItem(STORAGE_USERID_KEY);
+
+    if (userIDStorage) {
+      const userID = JSON.parse(userIDStorage);
+
+      API.get("/user")
+        .then((response) => {
+          if (userID == response.data.id) {
+            setAuthUserID(userID);
+          } else {
+            signOut();
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+
+          if (error.response.status == 401) {
+            signOut();
+          }
+        });
+    }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ signIn, signOut, signUp, authUserID, isLoading }}>
